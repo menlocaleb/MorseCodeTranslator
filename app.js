@@ -41,6 +41,7 @@ var mt = (function MorseTranslator() {
 	translator.inputCurrentlyDown = false;
 	translator.mostRecentDownTime = 0;
 	translator.outputId = "text-output";
+	translator.statusId = "status";
 	translator.letterTimeOut = null;
 
 	// TODO add parameter for how strict to time dots vs dashes
@@ -84,6 +85,7 @@ var mt = (function MorseTranslator() {
     // returns length of dot in milliseconds
 	translator.getBeatInterval = function() {
 
+		var statusField = document.getElementById(this.statusId);
 		// TODO add dynamic beat discovery
 		// for now make use type 'H' to establish beat
 
@@ -94,12 +96,24 @@ var mt = (function MorseTranslator() {
 		// validate for non-zero array length
 		// also require at least 4 taps before calculate beat interval
 		if (this.taps.length < 4) {
+			// update status for tap count
+			if (this.taps.length == 1) {
+				statusField.innerHTML = "&middot;";
+			} else {
+				statusField.innerHTML += "&middot;";
+			}
+			
+
 			return -1;
 		}
 
 		if (beatInterval !== 0) {
 			return beatInterval;
 		}
+
+
+		//update status to be initialized
+		statusField.innerHTML = "Ready to go!";
 
 		console.log(this.taps);
 		// compute as average of half the interval taps to ensure more valid calculation
@@ -171,22 +185,25 @@ var mt = (function MorseTranslator() {
 		var outputField = document.getElementById(this.outputId);
 		outputField.innerHTML = text;
 
-		var lastTap = "";
-		if (this.taps[this.taps.length-1].duration < unitLength * 1.5) {
-    		lastTap = "0";
-    	} else if (this.taps[this.taps.length-1].duration < unitLength * 4.5) {
-    		//var num = this.taps[i].duration / unitLength;
-    		lastTap = "1";
-    	}
-		// Finally need to add timer to finish letter or word if user is done rather than wait until next tap
-		this.letterTimeOut = setTimeout(function(){
-			
-	    	var letter = translator.getLetter(binaryWord + lastTap);
+		if (this.taps.length > 4) {
+			var lastTap = "";
+			if (this.taps[this.taps.length-1].duration < unitLength * 1.5) {
+	    		lastTap = "0";
+	    	} else if (this.taps[this.taps.length-1].duration < unitLength * 4.5) {
+	    		//var num = this.taps[i].duration / unitLength;
+	    		lastTap = "1";
+	    	}
+			// Finally need to add timer to finish letter or word if user is done rather than wait until next tap
+			this.letterTimeOut = setTimeout(function(){
+				
+		    	var letter = translator.getLetter(binaryWord + lastTap);
 
-			var outputField = document.getElementById(translator.outputId);
-			outputField.innerHTML += letter;
+				var outputField = document.getElementById(translator.outputId);
+				outputField.innerHTML += letter;
 
-		}, 4.5 * unitLength);
+			}, 4.5 * unitLength);
+		}
+		
 
 	}
 
