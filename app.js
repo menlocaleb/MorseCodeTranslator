@@ -172,9 +172,9 @@ var mt = (function MorseTranslator() {
 		outputField.innerHTML = text;
 
 		var lastTap = "";
-		if (this.taps[i].duration < unitLength * 1.5) {
+		if (this.taps[this.taps.length-1].duration < unitLength * 1.5) {
     		lastTap = "0";
-    	} else if (this.taps[i].duration < unitLength * 4.5) {
+    	} else if (this.taps[this.taps.length-1].duration < unitLength * 4.5) {
     		//var num = this.taps[i].duration / unitLength;
     		lastTap = "1";
     	}
